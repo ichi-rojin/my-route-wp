@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  db:
+    image: mysql:5.7
+    env_file: .env
+    volumes:
+      - db-data:/var/lib/mysql
+    restart: always
+
+  wordpress:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8765:80"
+    depends_on:
+      - db
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+    env_file: .env
+    volumes:
+      - ./plugins:/var/www/html/wp-content/plugins
+      - ./php.ini:/usr/local/etc/php/php.ini
+      - for-testing:/tmp
+    restart: always
+volumes:
+  db-data:
+    driver: local
+  for-testing:
+    driver: local
